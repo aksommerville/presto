@@ -17,7 +17,6 @@ static void load_tilesheet(const void *src,int srcc) {
 }
 
 int egg_client_init() {
-  fprintf(stderr,"%s:%d:%s: My game is starting up...\n",__FILE__,__LINE__,__func__);
   
   int fbw=0,fbh=0;
   egg_texture_get_status(&fbw,&fbh,1);
@@ -89,7 +88,11 @@ void egg_client_update(double elapsed) {
     if ((g.celebration-=elapsed)<=0.0) {
       begin_level(g.mapid+1);
     }
-    return;
+  }
+  if (g.mourntime>0.0) {
+    if ((g.mourntime-=elapsed)<=0.0) {
+      begin_level(g.mapid);
+    }
   }
   
   if (g.spellclock>0.0) {

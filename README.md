@@ -27,7 +27,8 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [x] Core mechanics: Walk, Jump, Carry
 - [x] Subject actions: Float, Expode, Mosey
 - [x] Level completion
-- [ ] Death
+- [x] Death
+- [ ] Treadles
 - [ ] Hello and farewell splashes.
 - [ ] Sound effects
 - [ ] Design levels

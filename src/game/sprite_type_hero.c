@@ -15,6 +15,8 @@ static int _hero_init(struct sprite *sprite) {
 
 static void _hero_update(struct sprite *sprite,double elapsed) {
 
+  if (g.celebration>0.0) return;
+
   /* Left and right to walk.
    * Nothing fancy here. Constant speed, etc.
    */
@@ -82,6 +84,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       if (tileid<0x80) tileid=(tileid&0x37)|((g.universe&2)<<5)|((g.universe&1)<<3);
       uint8_t physics=g.physics[tileid];
       if (physics==NS_physics_goal) {
+        if (CARRY) sprite_hero_pickup(sprite);
         win_level();
       }
     }
@@ -140,8 +143,8 @@ void sprite_hero_pickup(struct sprite *sprite) {
     if (!pumpkin) return;
     pumpkin->xform=sprite->xform;
     // Move instead of placing in the target spot initially, to let physics interfere.
+    sprite_move(pumpkin,0.0,0.5);
     sprite_move(pumpkin,sprite->xform?-1.0:1.0,0.0);
-    sprite_move(pumpkin,0.0,0.25);
     if (pumpkin->type->after_drop) pumpkin->type->after_drop(pumpkin);
     egg_play_sound(RID_sound_drop);
     CARRY=0;
@@ -149,8 +152,8 @@ void sprite_hero_pickup(struct sprite *sprite) {
     return;
   }
   
-  double ylo=sprite->y-1.5;
-  double yhi=sprite->y+0.5;
+  double ylo=sprite->y-1.75;
+  double yhi=sprite->y+0.75;
   double xtarget=sprite->x;
   if (sprite->xform) xtarget-=0.5; else xtarget+=0.5;
   struct sprite *best=0;
@@ -175,7 +178,7 @@ void sprite_hero_pickup(struct sprite *sprite) {
     bestdx=dx;
   }
   if (!best) return;
-  if (bestdx>1.5) return;
+  if (bestdx>2.0) return;
   
   egg_play_sound(RID_sound_pickup);
   CARRY=tileid_for_carry(best);

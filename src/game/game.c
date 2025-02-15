@@ -67,9 +67,15 @@ void reset_level() {
  */
  
 void win_level() {
-  // TODO Fanfare and denouement.
+  egg_play_sound(RID_sound_win);
+  egg_play_song(0,0,1);
   g.celebration=2.000;
-  //begin_level(g.mapid+1);
+}
+
+void fail_level() {
+  egg_play_sound(RID_sound_lose);
+  egg_play_song(0,0,1);
+  g.mourntime=2.000;
 }
 
 /* Choose a different universe.
@@ -167,4 +173,13 @@ void cast_spell() {
   #define MATCH(src) (!memcmp(norm+SPELL_LIMIT-sizeof(src)+1,src,sizeof(src)-1))
   if (MATCH("ddd")) { reset_level(); return; }
   #undef MATCH
+}
+
+/* Soulballs.
+ */
+ 
+void generate_soulballs(double x,double y,int c) {
+  struct sprite *sprite=sprite_new(&sprite_type_soulballs,x,y);
+  if (!sprite) return;
+  sprite->iv[0]=c;
 }
