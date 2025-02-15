@@ -10,5 +10,5 @@ desc=Hop between universes.
 freedom=free
 copyright=(c) 2025 AK Sommerville
 genre=Platformer
-# iconImage= image id, should be 16x16
+iconImage=3
 contact=aksommerville@gmail.com

@@ -30,9 +30,11 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [x] Death
 - [x] Treadles
 - [ ] Hello and farewell splashes.
+- [ ] Speed clock and death count.
+- [ ] Persist high score.
 - [x] Sound effects
-- [ ] Design levels
-- [ ] App icon
+- [x] Design levels
+- [x] App icon
 - [ ] Promo assets
 - [ ] Itch page
 
@@ -51,3 +53,16 @@ Daily goals:
 - - Hello/farewell
 - - Itch page
 - - Submit by 17:00, jam ends at 18:00
+
+Levels order:
+- hello
+- learn_treadle
+- fireproof_pumpkin
+- long_jump
+- my_pal_hippo
+- fly_march_bomb
+- bomb_treadle
+- remote_control
+- not_both
+- multi_bomb
+- bring_them_all

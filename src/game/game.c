@@ -260,6 +260,7 @@ void check_treadles() {
     }
   }
   if (!dirty) return;
+  egg_play_sound(RID_sound_treadle);
   struct lock *lock=g.lockv;
   for (i=g.lockc;i-->0;lock++) {
     int nstate=check_lock_1(lock);

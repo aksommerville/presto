@@ -15,10 +15,11 @@ static void _fire_update(struct sprite *sprite,double elapsed) {
     case 3: sprite->tileid=0xf1; sprite->xform=EGG_XFORM_XREV; break;
   }
   
-  double l=sprite->x-1.0;
-  double r=sprite->x+1.0;
-  double t=sprite->y-1.0;
-  double b=sprite->y+1.0;
+  double radius=0.75;
+  double l=sprite->x-radius;
+  double r=sprite->x+radius;
+  double t=sprite->y-radius;
+  double b=sprite->y+radius;
   struct sprite *victim=g.spritev;
   int i=g.spritec;
   for (;i-->0;victim++) {
