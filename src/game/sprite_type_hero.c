@@ -50,13 +50,52 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       JUMP_POWER=0.0;
     }
   }
+  
+  /* Create or destroy an advice sprite according to what we're standing near.
+   */
+  int advice=0;
+  int col=(int)sprite->x;
+  int row=(int)sprite->y;
+  if ((col>=0)&&(row>=0)&&(col<NS_sys_mapw)&&(row<NS_sys_maph)) {
+    uint8_t tile=g.map[row*NS_sys_mapw+col];
+    switch (tile) {
+      case 0xa1: advice=0xeb; break; // Altar Of Paralleleaping.
+    }
+  }
+  if (advice) {
+    struct sprite *advisor=sprite_advice_require();
+    if (advisor) {
+      advisor->x=col+0.5;
+      advisor->y=row-1.5;
+      advisor->tileid=advice;
+    }
+  } else {
+    sprite_advice_forbid();
+  }
+  
+  /* Check completion.
+   * There's no clock, instead we take a simplistic approach: Check only when standing still, and effect immediately.
+   */
+  if (!(g.pvinput&(EGG_BTN_LEFT|EGG_BTN_RIGHT))&&(JUMP_POWER>=JUMP_INITIAL)) {
+    if ((col>=0)&&(row>=0)&&(col<NS_sys_mapw)&&(row<NS_sys_maph-1)) {
+      uint8_t tileid=g.map[(row+1)*NS_sys_mapw+col];
+      if (tileid<0x80) tileid=(tileid&0x37)|((g.universe&2)<<5)|((g.universe&1)<<3);
+      uint8_t physics=g.physics[tileid];
+      if (physics==NS_physics_goal) {
+        win_level();
+      }
+    }
+  }
 }
 
 static void _hero_render(struct sprite *sprite) {
   int16_t dstx=(int16_t)(sprite->x*NS_sys_tilesize);
   int16_t dsty=(int16_t)(sprite->y*NS_sys_tilesize);
-  graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,sprite->tileid,sprite->xform);
-  graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty-NS_sys_tilesize,sprite->tileid-0x10,sprite->xform);
+  uint8_t tileid=sprite->tileid;
+  if (g.celebration>0.0) tileid=0xd1;
+  graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,tileid,sprite->xform);
+  graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty-NS_sys_tilesize,tileid-0x10,sprite->xform);
+  if (g.celebration>0.0) return;
   if (CARRY) {
     int16_t cdstx=dstx;
     const int16_t cdx=12,cdy=4;

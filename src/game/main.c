@@ -85,6 +85,13 @@ void egg_client_update(double elapsed) {
     g.pvinput=input;
   }
   
+  if (g.celebration>0.0) {
+    if ((g.celebration-=elapsed)<=0.0) {
+      begin_level(g.mapid+1);
+    }
+    return;
+  }
+  
   if (g.spellclock>0.0) {
     if ((g.spellclock-=elapsed)<=0.0) {
       memset(g.spellv,0,sizeof(g.spellv));

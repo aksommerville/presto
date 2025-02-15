@@ -10,21 +10,26 @@ void begin_level(int id) {
   
   /* Load cells from the map resource.
    */
-  const void *serial=0;
-  int serialc=0;
+  const void *serial=0,*s1=0;
+  int serialc=0,s1c=0;
   struct rom_reader reader;
   if (rom_reader_init(&reader,g.rom,g.romc)<0) return;
   struct rom_res *res;
   while (res=rom_reader_next(&reader)) {
     switch (res->tid) {
-      case EGG_TID_map: if (res->rid==id) { serial=res->v; serialc=res->c; break; }
+      case EGG_TID_map: {
+          if (res->rid==id) { serial=res->v; serialc=res->c; }
+          else if (res->rid==1) { s1=res->v; s1c=res->c; }
+        } break;
     }
     if (serial) break;
   }
   if (!serial) {
-    fprintf(stderr,"map:%d not found\n",id);
-    egg_terminate(1);
-    return;
+    if (!s1) { egg_terminate(1); return; }
+    fprintf(stderr,"End of maps. Restarting from map:1.\n");
+    g.mapid=1;
+    serial=s1;
+    serialc=s1c;
   }
   struct rom_map rmap={0};
   if (rom_map_decode(&rmap,serial,serialc)<0) return;
@@ -56,6 +61,15 @@ void begin_level(int id) {
 
 void reset_level() {
   begin_level(g.mapid);
+}
+
+/* Finish level, load the next one.
+ */
+ 
+void win_level() {
+  // TODO Fanfare and denouement.
+  g.celebration=2.000;
+  //begin_level(g.mapid+1);
 }
 
 /* Choose a different universe.

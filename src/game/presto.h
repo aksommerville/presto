@@ -28,6 +28,7 @@ extern struct g {
   uint8_t physics[256];
   uint8_t map[NS_sys_mapw*NS_sys_maph];
   int mapid;
+  double celebration; // Counts down during each level's victory denouement.
   
   int bg_dirty;
   int texid_bg;
@@ -46,6 +47,7 @@ extern struct g {
 
 void begin_level(int id);
 void reset_level();
+void win_level();
 void begin_universe_selection();
 void set_universe(int uv);
 void explode(double x,double y);

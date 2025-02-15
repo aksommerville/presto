@@ -37,12 +37,14 @@
 #define NS_spritetype_bomb 4
 #define NS_spritetype_hippopotamus 5
 #define NS_spritetype_explode 6
+#define NS_spritetype_advice 7
 #define FOR_EACH_spritetype \
   _(hero) \
   _(pumpkin) \
   _(balloon) \
   _(bomb) \
   _(hippopotamus) \
-  _(explode)
+  _(explode) \
+  _(advice)
 
 #endif

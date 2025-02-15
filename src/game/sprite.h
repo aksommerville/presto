@@ -66,4 +66,7 @@ FOR_EACH_spritetype
 void sprite_hero_interact(struct sprite *sprite);
 void sprite_hero_pickup(struct sprite *sprite);
 
+struct sprite *sprite_advice_require();
+void sprite_advice_forbid();
+
 #endif

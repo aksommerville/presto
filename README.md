@@ -26,7 +26,7 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [ ] Graphics: Keep it simple because you're drawing 4 different universes of each thing.
 - [x] Core mechanics: Walk, Jump, Carry
 - [x] Subject actions: Float, Expode, Mosey
-- [ ] Level completion
+- [x] Level completion
 - [ ] Death
 - [ ] Hello and farewell splashes.
 - [ ] Sound effects
