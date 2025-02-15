@@ -10,6 +10,7 @@
 
 static int _hero_init(struct sprite *sprite) {
   sprite->tileid=0xd0;
+  sprite->footed=1;
   return 0;
 }
 

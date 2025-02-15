@@ -5,6 +5,7 @@
 #define TTL_INIT 5.000
 
 static int _bomb_init(struct sprite *sprite) {
+  sprite->footed=1;
   sprite->tileid=0xe6;
   TTL=TTL_INIT;
   return 0;

@@ -5,6 +5,8 @@
  
 void begin_level(int id) {
   g.spritec=0;
+  g.treadlec=0;
+  g.lockc=0;
   g.universe=NS_uv_pumpkin;
   g.mapid=id;
   
@@ -48,6 +50,29 @@ void begin_level(int id) {
           uint8_t y=cmd.argv[1];
           uint16_t spritetype=(cmd.argv[2]<<8)|cmd.argv[3];
           struct sprite *sprite=sprite_new(sprite_type_by_id(spritetype),x+0.5,y+0.5);
+        } break;
+      case CMD_map_treadle: {
+          if (g.treadlec>=TREADLE_LIMIT) {
+            fprintf(stderr,"map:%d too many treadles, limit %d\n",g.mapid,TREADLE_LIMIT);
+          } else {
+            struct treadle *treadle=g.treadlev+g.treadlec++;
+            if ((treadle->x=cmd.argv[0])>=NS_sys_mapw) treadle->x=0;
+            if ((treadle->y=cmd.argv[1])>=NS_sys_maph) treadle->y=0;
+            treadle->flag=cmd.argv[2];
+            treadle->state=0;
+          }
+        } break;
+      case CMD_map_lock: {
+          if (g.lockc>=LOCK_LIMIT) {
+            fprintf(stderr,"map:%d too many locks, limit %d\n",g.mapid,LOCK_LIMIT);
+          } else {
+            struct lock *lock=g.lockv+g.lockc++;
+            if ((lock->x=cmd.argv[0])>=NS_sys_mapw) lock->x=0;
+            if ((lock->y=cmd.argv[1])>=NS_sys_maph) lock->y=0;
+            lock->flag=cmd.argv[2];
+            lock->state=cmd.argv[3];
+            lock->direction=cmd.argv[3];
+          }
         } break;
     }
   }
@@ -182,4 +207,67 @@ void generate_soulballs(double x,double y,int c) {
   struct sprite *sprite=sprite_new(&sprite_type_soulballs,x,y);
   if (!sprite) return;
   sprite->iv[0]=c;
+}
+
+/* Treadles and locks.
+ */
+ 
+static int check_treadle_1(const struct treadle *treadle) {
+  // Cheat the X boundaries out and only check the sprites' centers. Their radii should all be 0.5.
+  double l=treadle->x-0.25;
+  double r=treadle->x+1.25;
+  double t=treadle->y+0.8725;
+  double b=treadle->y+1.0000;
+  const struct sprite *sprite=g.spritev;
+  int i=g.spritec;
+  for (;i-->0;sprite++) {
+    if (sprite->defunct) continue;
+    if (!sprite->footed) continue;
+    if (sprite->x<l) continue;
+    if (sprite->x>r) continue;
+    double sb=sprite->y+sprite->radius-0.001;
+    if (sb<t) continue;
+    if (sb>b) continue;
+    return 1;
+  }
+  return 0;
+}
+
+static int check_lock_1(const struct lock *lock) {
+  const struct treadle *treadle=g.treadlev;
+  int i=g.treadlec;
+  for (;i-->0;treadle++) {
+    if (treadle->flag!=lock->flag) continue;
+    if (treadle->state) return lock->direction^1;
+  }
+  return lock->direction;
+}
+ 
+void check_treadles() {
+  int dirty=0;
+  struct treadle *treadle=g.treadlev;
+  int i=g.treadlec;
+  for (;i-->0;treadle++) {
+    int nstate=check_treadle_1(treadle);
+    if (nstate==treadle->state) continue;
+    g.bg_dirty=dirty=1;
+    int cellp=treadle->y*NS_sys_mapw+treadle->x;
+    if (treadle->state=nstate) {
+      g.map[cellp]++;
+    } else {
+      g.map[cellp]--;
+    }
+  }
+  if (!dirty) return;
+  struct lock *lock=g.lockv;
+  for (i=g.lockc;i-->0;lock++) {
+    int nstate=check_lock_1(lock);
+    if (nstate==lock->state) continue;
+    int cellp=lock->y*NS_sys_mapw+lock->x;
+    if (lock->state=nstate) {
+      g.map[cellp]++;
+    } else {
+      g.map[cellp]--;
+    }
+  }
 }

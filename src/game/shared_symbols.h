@@ -11,6 +11,8 @@
 
 #define CMD_map_image     0x20 /* u16:imageid */
 #define CMD_map_sprite    0x40 /* u16:pos u16:spritetype */
+#define CMD_map_treadle   0x41 /* u16:pos u8:flag u8:reserved */
+#define CMD_map_lock      0x42 /* u16:pos u8:flag u8:state */
 
 #define CMD_sprite_image  0x20 /* u16:imageid */
 #define CMD_sprite_tile   0x21 /* u8:tileid u8:xform */

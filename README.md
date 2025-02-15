@@ -28,7 +28,7 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [x] Subject actions: Float, Expode, Mosey
 - [x] Level completion
 - [x] Death
-- [ ] Treadles
+- [x] Treadles
 - [ ] Hello and farewell splashes.
 - [ ] Sound effects
 - [ ] Design levels

@@ -1,6 +1,7 @@
 #include "presto.h"
 
 static int _pumpkin_init(struct sprite *sprite) {
+  sprite->footed=1;
   sprite->tileid=0xe0;
   return 0;
 }

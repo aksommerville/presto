@@ -9,6 +9,7 @@
 
 static int _hippopotamus_init(struct sprite *sprite) {
   sprite->tileid=0xe3;
+  sprite->footed=1;
   return 0;
 }
 

@@ -15,6 +15,8 @@
 
 #define SPELL_LIMIT 8
 #define SPELL_MIN_INTERVAL 0.500
+#define TREADLE_LIMIT 8
+#define LOCK_LIMIT 16
 
 extern struct g {
   void *rom;
@@ -44,6 +46,21 @@ extern struct g {
   uint16_t spellv[SPELL_LIMIT];
   int spellp;
   double spellclock;
+  
+  struct treadle {
+    uint8_t x,y;
+    uint8_t flag;
+    uint8_t state;
+  } treadlev[TREADLE_LIMIT];
+  int treadlec;
+  
+  struct lock {
+    uint8_t x,y;
+    uint8_t flag;
+    uint8_t state;
+    uint8_t direction; // 0=true->true, 1=true->false */
+  } lockv[LOCK_LIMIT];
+  int lockc;
 } g;
 
 void begin_level(int id);
@@ -55,5 +72,6 @@ void set_universe(int uv);
 void explode(double x,double y);
 void cast_spell();
 void generate_soulballs(double x,double y,int c);
+void check_treadles();
 
 #endif

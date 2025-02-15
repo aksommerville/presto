@@ -28,7 +28,7 @@ struct sprite {
   double x,y;
   uint8_t tileid;
   uint8_t xform;
-  int mode;
+  int footed; // Can actuate treadles.
   double radius;
   double gravity; // For physics.
   double terminal_velocity;

@@ -109,6 +109,7 @@ void egg_client_update(double elapsed) {
   }
   
   sprites_drop_defunct();
+  check_treadles();
 }
 
 void egg_client_render() {
