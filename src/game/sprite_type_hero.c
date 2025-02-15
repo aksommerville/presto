@@ -1,7 +1,9 @@
 #include "presto.h"
 
 #define JUMP_POWER sprite->fv[0]
+#define ANIMCLOCK sprite->fv[1]
 #define CARRY sprite->iv[0]
+#define ANIMFRAME sprite->iv[1]
 
 #define JUMP_INITIAL      25.000
 #define JUMP_REDUCE_RATE 100.000
@@ -21,15 +23,27 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
   /* Left and right to walk.
    * Nothing fancy here. Constant speed, etc.
    */
+  int walking=0;
   switch (g.pvinput&(EGG_BTN_LEFT|EGG_BTN_RIGHT)) {
     case EGG_BTN_LEFT: {
         sprite->xform=EGG_XFORM_XREV;
         sprite_move(sprite,-WALK_SPEED*elapsed,0.0);
+        walking=1;
       } break;
     case EGG_BTN_RIGHT: {
         sprite->xform=0;
         sprite_move(sprite,WALK_SPEED*elapsed,0.0);
+        walking=1;
       } break;
+  }
+  if (walking) {
+    if ((ANIMCLOCK-=elapsed)<=0.0) {
+      ANIMCLOCK+=0.200;
+      if (++(ANIMFRAME)>=2) ANIMFRAME=0;
+    }
+  } else {
+    ANIMCLOCK=0.0;
+    ANIMFRAME=0;
   }
   
   /* Jump if we're doing that, and gravity if not.
@@ -96,17 +110,21 @@ static void _hero_render(struct sprite *sprite) {
   int16_t dstx=(int16_t)(sprite->x*NS_sys_tilesize);
   int16_t dsty=(int16_t)(sprite->y*NS_sys_tilesize);
   uint8_t tileid=sprite->tileid;
-  if (g.celebration>0.0) tileid=0xd1;
+  if (g.celebration>0.0) tileid=0xd2;
+  else if (ANIMFRAME) tileid=0xd1;
   graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,tileid,sprite->xform);
   graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty-NS_sys_tilesize,tileid-0x10,sprite->xform);
   if (g.celebration>0.0) return;
   if (CARRY) {
     int16_t cdstx=dstx;
-    const int16_t cdx=12,cdy=4;
+    const int16_t cdx=11,cdy=2;
     if (sprite->xform) cdstx-=cdx;
     else cdstx+=cdx;
     int16_t cdsty=dsty-cdy;
     graf_draw_tile(&g.graf,g.texid_tiles,cdstx,cdsty,CARRY,sprite->xform);
+    graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,0xd5,sprite->xform);
+  } else {
+    graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,0xd3+ANIMFRAME,sprite->xform);
   }
 }
 

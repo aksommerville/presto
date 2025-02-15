@@ -16,7 +16,7 @@ static int _hippopotamus_init(struct sprite *sprite) {
 static void _hippopotamus_update(struct sprite *sprite,double elapsed) {
   sprite_gravity(sprite,elapsed);
   if ((ANIMCLOCK-=elapsed)<=0.0) {
-    ANIMCLOCK+=0.125;
+    ANIMCLOCK+=0.200;
     if (++(ANIMFRAME)>=4) ANIMFRAME=0;
     switch (ANIMFRAME) {
       case 0: case 2: sprite->tileid=0xe3; break;
