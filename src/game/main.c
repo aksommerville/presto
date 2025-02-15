@@ -50,18 +50,33 @@ int egg_client_init() {
   return 0;
 }
 
+void on_up() {
+  struct sprite *hero=sprites_any_of_type(&sprite_type_hero);
+  if (!hero) return;
+  sprite_hero_interact(hero);
+}
+
+void on_b() {
+  struct sprite *hero=sprites_any_of_type(&sprite_type_hero);
+  if (!hero) return;
+  sprite_hero_pickup(hero);
+}
+
 void egg_client_update(double elapsed) {
 
   int input=egg_input_get_one(0);
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
+    if ((input&EGG_BTN_UP)&&!(g.pvinput&EGG_BTN_UP)) on_up();
+    if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) on_b();
     g.pvinput=input;
   }
   
   struct sprite *sprite=g.spritev;
   int i=g.spritec;
   for (;i-->0;sprite++) {
-    //TODO update sprite
+    if (sprite->defunct) continue;
+    if (sprite->type->update) sprite->type->update(sprite,elapsed);
   }
   
   sprites_drop_defunct();
@@ -95,11 +110,12 @@ void egg_client_render() {
   struct sprite *sprite=g.spritev;
   int i=g.spritec;
   for (;i-->0;sprite++) {
-    int16_t dstx=(int)(sprite->x*NS_sys_tilesize);
-    int16_t dsty=(int)(sprite->y*NS_sys_tilesize);
-    graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,sprite->tileid,sprite->xform);
-    if (sprite->mode==SPRITE_MODE_TALL) {
-      graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty-NS_sys_tilesize,sprite->tileid-0x10,sprite->xform);
+    if (sprite->type->render) {
+      sprite->type->render(sprite);
+    } else {
+      int16_t dstx=(int)(sprite->x*NS_sys_tilesize);
+      int16_t dsty=(int)(sprite->y*NS_sys_tilesize);
+      graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,sprite->tileid,sprite->xform);
     }
   }
   

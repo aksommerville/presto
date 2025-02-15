@@ -21,8 +21,10 @@ Bring an object into the Control Room with you, to prevent it from changing type
 ## TODO
 
 - [x] Music: 5 songs. Can I write 5 songs in 50 hours, and also write a game? I wrote 3 yesterday. Sure, why not!
+- [ ] bouncing_star, one of these instruments is out of tune or something
+- [ ] Dropping pumpkin: Mind initial position, ensure it's not inside a wall. Also, should be easier to drop off an edge.
 - [ ] Graphics: Keep it simple because you're drawing 4 different universes of each thing.
-- [ ] Core mechanics: Walk, Jump, Carry
+- [x] Core mechanics: Walk, Jump, Carry
 - [ ] Subject actions: Float, Expode, Mosey
 - [ ] Level completion
 - [ ] Death

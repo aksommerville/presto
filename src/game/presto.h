@@ -34,5 +34,7 @@ extern struct g {
 } g;
 
 void begin_level(int id);
+void begin_universe_selection();
+void set_universe(int uv);
 
 #endif

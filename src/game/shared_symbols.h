@@ -10,9 +10,7 @@
 #define NS_sys_maph 11
 
 #define CMD_map_image     0x20 /* u16:imageid */
-#define CMD_map_neighbors 0x60 /* u16:left u16:right u16:up u16:down */
-#define CMD_map_sprite    0x61 /* u16:pos u16:spriteid u32:reserved */
-#define CMD_map_door      0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
+#define CMD_map_sprite    0x40 /* u16:pos u16:spritetype */
 
 #define CMD_sprite_image  0x20 /* u16:imageid */
 #define CMD_sprite_tile   0x21 /* u8:tileid u8:xform */
@@ -31,5 +29,17 @@
 #define NS_uv_balloon 1
 #define NS_uv_bomb 2
 #define NS_uv_hippopotamus 3
+
+#define NS_spritetype_hero 1
+#define NS_spritetype_pumpkin 2
+#define NS_spritetype_balloon 3
+#define NS_spritetype_bomb 4
+#define NS_spritetype_hippopotamus 5
+#define FOR_EACH_spritetype \
+  _(hero) \
+  _(pumpkin) \
+  _(balloon) \
+  _(bomb) \
+  _(hippopotamus)
 
 #endif
