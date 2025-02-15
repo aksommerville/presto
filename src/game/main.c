@@ -44,7 +44,7 @@ int egg_client_init() {
   
   srand_auto();
   
-  begin_level(1);
+  begin_level(6);
   
   return 0;
 }
