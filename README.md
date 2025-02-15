@@ -20,7 +20,7 @@ Bring an object into the Control Room with you, to prevent it from changing type
 
 ## TODO
 
-- [ ] Music: 5 songs. Can I write 5 songs in 50 hours, and also write a game? I wrote 3 yesterday. Sure, why not!
+- [x] Music: 5 songs. Can I write 5 songs in 50 hours, and also write a game? I wrote 3 yesterday. Sure, why not!
 - [ ] Graphics: Keep it simple because you're drawing 4 different universes of each thing.
 - [ ] Core mechanics: Walk, Jump, Carry
 - [ ] Subject actions: Float, Expode, Mosey

@@ -1,52 +1,107 @@
-#include "egg/egg.h"
-#include "opt/stdlib/egg-stdlib.h"
-#include "opt/graf/graf.h"
-#include "opt/text/text.h"
-#include "egg_rom_toc.h"
-#include "shared_symbols.h"
+#include "presto.h"
 
-static void *rom=0;
-static int romc=0;
-static struct graf graf={0};
-static struct font *font=0;
-static int texid_message=0;
-static int messagew=0,messageh=0;
-static int fbw=0,fbh=0;
+struct g g={0};
 
 void egg_client_quit(int status) {
-  // Flush save state, log performance... Usually noop.
-  // Full cleanup really isn't necessary, but if you like:
-  if (rom) free(rom);
-  font_del(font);
-  egg_texture_del(texid_message);
+}
+
+static void load_tilesheet(const void *src,int srcc) {
+  struct rom_tilesheet_reader reader;
+  if (rom_tilesheet_reader_init(&reader,src,srcc)<0) return;
+  struct rom_tilesheet_entry entry;
+  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
+    if (entry.tableid==NS_tilesheet_physics) {
+      memcpy(g.physics+entry.tileid,entry.v,entry.c);
+    }
+  }
 }
 
 int egg_client_init() {
   fprintf(stderr,"%s:%d:%s: My game is starting up...\n",__FILE__,__LINE__,__func__);
   
+  int fbw=0,fbh=0;
   egg_texture_get_status(&fbw,&fbh,1);
+  if ((fbw!=FBW)||(fbh!=FBH)) return -1;
   
-  if ((romc=egg_get_rom(0,0))<=0) return -1;
-  if (!(rom=malloc(romc))) return -1;
-  if (egg_get_rom(rom,romc)!=romc) return -1;
-  strings_set_rom(rom,romc);
+  if ((g.romc=egg_get_rom(0,0))<=0) return -1;
+  if (!(g.rom=malloc(g.romc))) return -1;
+  if (egg_get_rom(g.rom,g.romc)!=g.romc) return -1;
+  strings_set_rom(g.rom,g.romc);
   
-  if (!(font=font_new())) return -1;
-  if (font_add_image_resource(font,0x0020,RID_image_font9_0020)<0) return -1;
-  if ((texid_message=font_tex_oneline(font,"Game is running!",-1,200,0xffffffff))<0) return -1;
-  egg_texture_get_status(&messagew,&messageh,texid_message);
+  if (!(g.font=font_new())) return -1;
+  if (font_add_image_resource(g.font,0x0020,RID_image_font9_0020)<0) return -1;
+  
+  if (egg_texture_load_image(g.texid_tiles=egg_texture_new(),RID_image_tiles)<0) return -1;
+  if (egg_texture_load_raw(g.texid_bg=egg_texture_new(),FBW,FBH,FBW<<2,0,0)<0) return -1;
+  
+  struct rom_reader reader;
+  if (rom_reader_init(&reader,g.rom,g.romc)<0) return -1;
+  struct rom_res *res;
+  while (res=rom_reader_next(&reader)) {
+    switch (res->tid) {
+      case EGG_TID_tilesheet: if (res->rid==RID_tilesheet_tiles) load_tilesheet(res->v,res->c); break;
+    }
+  }
   
   srand_auto();
+  
+  begin_level(1);
   
   return 0;
 }
 
 void egg_client_update(double elapsed) {
-  // TODO
+
+  int input=egg_input_get_one(0);
+  if (input!=g.pvinput) {
+    if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
+    g.pvinput=input;
+  }
+  
+  struct sprite *sprite=g.spritev;
+  int i=g.spritec;
+  for (;i-->0;sprite++) {
+    //TODO update sprite
+  }
+  
+  sprites_drop_defunct();
 }
 
 void egg_client_render() {
-  graf_reset(&graf);
-  graf_draw_decal(&graf,texid_message,(fbw>>1)-(messagew>>1),(fbh>>1)-(messageh>>1),0,0,messagew,messageh,0);
-  graf_flush(&graf);
+  graf_reset(&g.graf);
+  
+  if (g.bg_dirty) {
+    struct egg_draw_tile vtxv[NS_sys_mapw*NS_sys_maph];
+    struct egg_draw_tile *vtx=vtxv;
+    const uint8_t *src=g.map;
+    int16_t y=NS_sys_tilesize>>1;
+    int yi=NS_sys_maph;
+    for (;yi-->0;y+=NS_sys_tilesize) {
+      int16_t x=NS_sys_tilesize>>1;
+      int xi=NS_sys_mapw;
+      for (;xi-->0;x+=NS_sys_tilesize,vtx++,src++) {
+        vtx->dstx=x;
+        vtx->dsty=y;
+        if (*src<0x80) vtx->tileid=((*src)&0x37)|((g.universe&2)<<5)|((g.universe&1)<<3);
+        else vtx->tileid=*src;
+        vtx->xform=0;
+      }
+    }
+    egg_draw_tile(g.texid_bg,g.texid_tiles,vtxv,NS_sys_mapw*NS_sys_maph);
+  }
+  
+  graf_draw_decal(&g.graf,g.texid_bg,0,0,0,0,FBW,FBH,0);
+  
+  struct sprite *sprite=g.spritev;
+  int i=g.spritec;
+  for (;i-->0;sprite++) {
+    int16_t dstx=(int)(sprite->x*NS_sys_tilesize);
+    int16_t dsty=(int)(sprite->y*NS_sys_tilesize);
+    graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty,sprite->tileid,sprite->xform);
+    if (sprite->mode==SPRITE_MODE_TALL) {
+      graf_draw_tile(&g.graf,g.texid_tiles,dstx,dsty-NS_sys_tilesize,sprite->tileid-0x10,sprite->xform);
+    }
+  }
+  
+  graf_flush(&g.graf);
 }
