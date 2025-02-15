@@ -44,6 +44,10 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       if (!(g.pvinput&EGG_BTN_SOUTH)) {
         JUMP_POWER=JUMP_INITIAL;
       }
+    } else if (JUMP_POWER<JUMP_INITIAL) { // Stopped mid-jump. No restartsies.
+      JUMP_POWER=0.0;
+    } else if (sprite->gravity>2.0) { // Wait for gravity to kick in; allow some coyote time.
+      JUMP_POWER=0.0;
     }
   }
 }
