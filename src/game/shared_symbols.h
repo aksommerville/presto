@@ -24,6 +24,7 @@
 #define NS_physics_solid 1
 #define NS_physics_goal 2
 #define NS_physics_timemachine 3
+#define NS_physics_fragile 4
 
 #define NS_uv_pumpkin 0
 #define NS_uv_balloon 1
@@ -35,11 +36,13 @@
 #define NS_spritetype_balloon 3
 #define NS_spritetype_bomb 4
 #define NS_spritetype_hippopotamus 5
+#define NS_spritetype_explode 6
 #define FOR_EACH_spritetype \
   _(hero) \
   _(pumpkin) \
   _(balloon) \
   _(bomb) \
-  _(hippopotamus)
+  _(hippopotamus) \
+  _(explode)
 
 #endif

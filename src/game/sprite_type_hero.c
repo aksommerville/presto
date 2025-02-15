@@ -6,6 +6,7 @@
 #define JUMP_INITIAL      25.000
 #define JUMP_REDUCE_RATE 100.000
 #define WALK_SPEED 8.0
+#define TERMINAL_VELOCITY_BALLOON 3.0
 
 static int _hero_init(struct sprite *sprite) {
   sprite->tileid=0xd0;
@@ -85,9 +86,6 @@ void sprite_hero_pickup(struct sprite *sprite) {
   if (!sprite||(sprite->type!=&sprite_type_hero)) return;
   
   if (CARRY) {
-    double px=sprite->x;
-    if (sprite->xform) px-=0.5; else px+=0.5;
-    double py=sprite->y-0.25;
     const struct sprite_type *type=0;
     switch (CARRY) {
       case 0xe0: type=&sprite_type_pumpkin; break;
@@ -95,10 +93,16 @@ void sprite_hero_pickup(struct sprite *sprite) {
       case 0xe2: type=&sprite_type_bomb; break;
       case 0xe3: type=&sprite_type_hippopotamus; break;
     }
-    struct sprite *pumpkin=sprite_new(type,px,py);
+    struct sprite *pumpkin=sprite_new(type,sprite->x,sprite->y-0.5);
     if (!pumpkin) return;
+    pumpkin->xform=sprite->xform;
+    // Move instead of placing in the target spot initially, to let physics interfere.
+    sprite_move(pumpkin,sprite->xform?-1.0:1.0,0.0);
+    sprite_move(pumpkin,0.0,0.25);
+    if (pumpkin->type->after_drop) pumpkin->type->after_drop(pumpkin);
     egg_play_sound(RID_sound_drop);
     CARRY=0;
+    sprite->terminal_velocity=TERMINAL_VELOCITY_DEFAULT;
     return;
   }
   
@@ -131,7 +135,10 @@ void sprite_hero_pickup(struct sprite *sprite) {
   if (bestdx>1.5) return;
   
   egg_play_sound(RID_sound_pickup);
-  CARRY=best->tileid;
+  CARRY=tileid_for_carry(best);
   best->defunct=1;
+  if (CARRY==0xe1) { // balloon
+    sprite->terminal_velocity=TERMINAL_VELOCITY_BALLOON;
+  }
 }
 

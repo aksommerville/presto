@@ -8,6 +8,8 @@
 #define SPRITE_IV_SIZE 4
 #define SPRITE_FV_SIZE 4
 
+#define TERMINAL_VELOCITY_DEFAULT 14.0
+
 struct sprite;
 struct sprite_type;
 
@@ -16,6 +18,8 @@ struct sprite_type {
   int (*init)(struct sprite *sprite);
   void (*update)(struct sprite *sprite,double elapsed);
   void (*render)(struct sprite *sprite);
+  void (*after_drop)(struct sprite *sprite);
+  void (*after_retype)(struct sprite *sprite);
 };
 
 struct sprite {
@@ -44,11 +48,7 @@ int sprite_retype(struct sprite *sprite,const struct sprite_type *type);
  */
 int sprite_is_transformable(const struct sprite *sprite);
 
-/* Move (sprite) to the nearest valid position.
- * Optionally apply gravity first. If applying, we need (elapsed), otherwise it's ignored.
- * Returns nonzero if position changed due to collision.
- */
-//int sprite_rectify_position(struct sprite *sprite,int gravity,double elapsed);
+uint8_t tileid_for_carry(const struct sprite *sprite);
 
 /* Apply motion.
  * If you want collisions, you must apply motion via these.

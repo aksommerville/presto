@@ -66,10 +66,29 @@ void egg_client_update(double elapsed) {
 
   int input=egg_input_get_one(0);
   if (input!=g.pvinput) {
+    uint16_t freshbits=input&~g.pvinput;
+    int mask=1,cast=0;
+    for (;mask<=freshbits;mask<<=1) {
+      if (mask&freshbits) {
+        g.spellv[g.spellp]=mask;
+        if (++(g.spellp)>=SPELL_LIMIT) g.spellp=0;
+        cast=1;
+      }
+    }
+    if (cast) {
+      cast_spell();
+      g.spellclock=SPELL_MIN_INTERVAL;
+    }
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
     if ((input&EGG_BTN_UP)&&!(g.pvinput&EGG_BTN_UP)) on_up();
     if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) on_b();
     g.pvinput=input;
+  }
+  
+  if (g.spellclock>0.0) {
+    if ((g.spellclock-=elapsed)<=0.0) {
+      memset(g.spellv,0,sizeof(g.spellv));
+    }
   }
   
   struct sprite *sprite=g.spritev;

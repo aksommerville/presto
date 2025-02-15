@@ -11,8 +11,15 @@ static int sprite_map_collision(const struct sprite *sprite,int cola,int colz,in
   int row=rowa; for (;row<=rowz;row++,cellrow+=NS_sys_mapw) {
     const uint8_t *cellp=cellrow;
     int col=cola; for (;col<=colz;col++,cellp++) {
-      uint8_t physics=g.physics[*cellp];
-      if ((physics==NS_physics_solid)||(physics==NS_physics_goal)) return 1;
+      uint8_t tileid=*cellp;
+      // Allow the parallel tiles in different universes to have different physics, not just appearance.
+      if (tileid<0x80) tileid=(tileid&0x37)|((g.universe&2)<<5)|((g.universe&1)<<3);
+      uint8_t physics=g.physics[tileid];
+      if (
+        (physics==NS_physics_solid)||
+        (physics==NS_physics_goal)||
+        (physics==NS_physics_fragile)
+      ) return 1;
     }
   }
   return 0;
