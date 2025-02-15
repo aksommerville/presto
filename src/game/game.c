@@ -153,7 +153,8 @@ void set_universe(int uv) {
  */
  
 void explode(double x,double y) {
-  egg_play_sound(RID_sound_explode);
+  if (!g.exploded) egg_play_sound(RID_sound_explode);
+  g.exploded=1;
   const double radius=0.888;
   int cola=(int)(x-radius); if (cola<0) cola=0;
   int colz=(int)(x+radius); if (colz>=NS_sys_mapw) colz=NS_sys_mapw-1;

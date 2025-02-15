@@ -62,6 +62,7 @@ void on_b() {
 }
 
 void egg_client_update(double elapsed) {
+  g.exploded=0;
 
   int input=egg_input_get_one(0);
   if (input!=g.pvinput) {

@@ -32,6 +32,7 @@ extern struct g {
   int mapid;
   double celebration; // Counts down during each level's victory denouement.
   double mourntime; // ''
+  int exploded; // For limiting sound effect.
   
   int bg_dirty;
   int texid_bg;

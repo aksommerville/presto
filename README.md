@@ -30,7 +30,7 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [x] Death
 - [x] Treadles
 - [ ] Hello and farewell splashes.
-- [ ] Sound effects
+- [x] Sound effects
 - [ ] Design levels
 - [ ] App icon
 - [ ] Promo assets
