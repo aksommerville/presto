@@ -29,9 +29,9 @@ Bring an object into the Control Room with you, to prevent it from changing type
 - [x] Level completion
 - [x] Death
 - [x] Treadles
-- [ ] Hello and farewell splashes.
-- [ ] Speed clock and death count.
-- [ ] Persist high score.
+- [x] Hello and farewell splashes.
+- [x] Speed clock and death count.
+- [x] Persist high score.
 - [x] Sound effects
 - [x] Design levels
 - [x] App icon

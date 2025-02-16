@@ -9,6 +9,7 @@
 #include "egg_rom_toc.h"
 #include "shared_symbols.h"
 #include "sprite.h"
+#include "menu.h"
 
 #define FBW 320
 #define FBH 176
@@ -26,6 +27,13 @@ extern struct g {
   struct font *font;
   int pvinput;
   
+  /* I don't want to think too much about this.
+   * If either of these is not null, it's the active mode.
+   * Both null, the game is running.
+   */
+  struct hello *hello;
+  struct gameover *gameover;
+  
   int universe; // NS_uv_*
   uint8_t physics[256];
   uint8_t map[NS_sys_mapw*NS_sys_maph];
@@ -33,6 +41,9 @@ extern struct g {
   double celebration; // Counts down during each level's victory denouement.
   double mourntime; // ''
   int exploded; // For limiting sound effect.
+  double besttime;
+  double gametime;
+  int deathc;
   
   int bg_dirty;
   int texid_bg;
@@ -64,7 +75,7 @@ extern struct g {
   int lockc;
 } g;
 
-void begin_level(int id);
+int begin_level(int id);
 void reset_level();
 void win_level();
 void fail_level();
@@ -74,5 +85,7 @@ void explode(double x,double y);
 void cast_spell();
 void generate_soulballs(double x,double y,int c);
 void check_treadles();
+void check_high_score();
+void load_high_score();
 
 #endif

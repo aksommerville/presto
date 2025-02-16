@@ -3,7 +3,7 @@
 /* Begin level.
  */
  
-void begin_level(int id) {
+int begin_level(int id) {
   g.spritec=0;
   g.treadlec=0;
   g.lockc=0;
@@ -12,30 +12,23 @@ void begin_level(int id) {
   
   /* Load cells from the map resource.
    */
-  const void *serial=0,*s1=0;
-  int serialc=0,s1c=0;
+  const void *serial=0;
+  int serialc=0;
   struct rom_reader reader;
-  if (rom_reader_init(&reader,g.rom,g.romc)<0) return;
+  if (rom_reader_init(&reader,g.rom,g.romc)<0) return -1;
   struct rom_res *res;
   while (res=rom_reader_next(&reader)) {
     switch (res->tid) {
       case EGG_TID_map: {
           if (res->rid==id) { serial=res->v; serialc=res->c; }
-          else if (res->rid==1) { s1=res->v; s1c=res->c; }
         } break;
     }
     if (serial) break;
   }
-  if (!serial) {
-    if (!s1) { egg_terminate(1); return; }
-    fprintf(stderr,"End of maps. Restarting from map:1.\n");
-    g.mapid=1;
-    serial=s1;
-    serialc=s1c;
-  }
+  if (!serial) return -1;
   struct rom_map rmap={0};
-  if (rom_map_decode(&rmap,serial,serialc)<0) return;
-  if ((rmap.w!=NS_sys_mapw)||(rmap.h!=NS_sys_maph)) return;
+  if (rom_map_decode(&rmap,serial,serialc)<0) return -1;
+  if ((rmap.w!=NS_sys_mapw)||(rmap.h!=NS_sys_maph)) return -1;
   memcpy(g.map,rmap.v,NS_sys_mapw*NS_sys_maph);
   g.bg_dirty=1;
   
@@ -82,6 +75,7 @@ void begin_level(int id) {
    */
   g.universe=-1;
   set_universe(NS_uv_pumpkin);
+  return 0;
 }
 
 void reset_level() {
@@ -197,7 +191,7 @@ void cast_spell() {
   }
   //fprintf(stderr,"Cast spell: %.*s\n",SPELL_LIMIT,norm);
   #define MATCH(src) (!memcmp(norm+SPELL_LIMIT-sizeof(src)+1,src,sizeof(src)-1))
-  if (MATCH("ddd")) { reset_level(); return; }
+  if (MATCH("ddd")) { g.deathc++; reset_level(); return; }
   #undef MATCH
 }
 
@@ -270,6 +264,41 @@ void check_treadles() {
       g.map[cellp]++;
     } else {
       g.map[cellp]--;
+    }
+  }
+}
+
+/* High score.
+ */
+ 
+void check_high_score() {
+  if ((g.besttime<=0.0)||(g.gametime<g.besttime)) {
+    g.besttime=g.gametime;
+    int ms=(int)(g.gametime*1000.0);
+    if ((ms>0)&&(ms<1000000000)) {
+      char v[16];
+      int vc=1,limit=10;
+      while (ms>=limit) { vc++; limit*=10; }
+      int i=vc; for (;i-->0;ms/=10) v[i]='0'+ms%10;
+      egg_store_set("hiscore",7,v,vc);
+    }
+  }
+}
+
+void load_high_score() {
+  g.besttime=0.0;
+  char src[256];
+  int srcc=egg_store_get(src,sizeof(src),"hiscore",7);
+  if ((srcc>0)&&(srcc<=sizeof(src))) {
+    int srcp=0,ms=0;
+    while ((srcp<srcc)&&(src[srcp]>='0')&&(src[srcp]<='9')) {
+      ms*=10;
+      ms+=src[srcp]-'0';
+      srcp++;
+      if (ms>100000000) { ms=0; break; }
+    }
+    if ((srcp>=srcc)&&(ms>0)) {
+      g.besttime=(double)ms/1000.0;
     }
   }
 }
