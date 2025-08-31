@@ -84,6 +84,7 @@ void egg_client_update(double elapsed) {
       }
     }
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
+    if ((input&EGG_BTN_AUX2)&&!(g.pvinput&EGG_BTN_AUX2)) egg_terminate(0);
     if (g.hello) hello_input(g.hello,input,g.pvinput);
     else if (g.gameover) gameover_input(g.gameover,input,g.pvinput);
     else {
